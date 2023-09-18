@@ -1,0 +1,8 @@
+.data-grid-container {
+  height: 400px;
+  width: 100%;
+}
+
+.MuiDataGrid-cell {
+  text-overflow: clip;
+}
