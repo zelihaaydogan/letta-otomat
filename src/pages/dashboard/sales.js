@@ -48,7 +48,16 @@ export default function GeneralAnalytics() {
 
       if (response.returnCode === 1) {
         setSalesData(response.data);
-        setSalesLabel(response.columnDict);
+        const updatedLabels = response.columnDict
+          .filter((item) => item.field !== 'id')
+          .map((item) => ({
+            ...item,
+
+            resizable: false,
+            flex: 1,
+            minWidth: 220,
+          }));
+        setSalesLabel(updatedLabels);
       }
     };
 
@@ -120,7 +129,6 @@ export default function GeneralAnalytics() {
                   components={{ Toolbar: GridToolbar }}
                   disableSelectionOnClick
                   autoHeight={true}
-                  checkboxSelection
                 />
               </Card>
             </Grid>

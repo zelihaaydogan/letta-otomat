@@ -29,6 +29,7 @@ const ICONS = {
   automat: getIcon('ic_automat'),
   automatDefinitions: getIcon('ic_automat'),
   sales: getIcon('ic_sales'),
+  product: getIcon('ic_product'),
 };
 
 const navConfig = [
@@ -55,15 +56,16 @@ const navConfig = [
         path: PATH_DASHBOARD.user.root,
         icon: ICONS.reports,
         children: [
-          { title: 'Alarmlar', path: PATH_DASHBOARD.user.list },
-          { title: 'Tamamlanmış operasyonlar', path: PATH_DASHBOARD.user.profile },
-          { title: 'Otomat olayları', path: PATH_DASHBOARD.user.cards },
-          { title: 'Arayüz İşlemleri', path: PATH_DASHBOARD.user.account },
+          { title: 'Satış Raporları', path: PATH_DASHBOARD.user.list },
+          { title: 'Ödeme Raporları', path: PATH_DASHBOARD.user.profile },
+
+          // { title: 'Arayüz İşlemleri', path: PATH_DASHBOARD.user.account },
           // { title: 'create', path: PATH_DASHBOARD.user.new },
 
           // { title: 'account', path: PATH_DASHBOARD.user.account },
         ],
       },
+      { title: 'Ürünler', path: PATH_DASHBOARD.user.cards, icon: ICONS.product },
 
       { title: 'Kullanıcılar', path: PATH_DASHBOARD.general.banking, icon: ICONS.banking },
 

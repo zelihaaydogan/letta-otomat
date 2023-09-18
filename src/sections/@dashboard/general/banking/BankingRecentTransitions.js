@@ -140,7 +140,9 @@ function BankingRecentTransitionsRow({ row, chartColor, chartData, tableData }) 
 
       <TableCell>
         <Typography variant="subtitle2">{row.amount}</Typography>
-        <Typography variant="subtitle2">{formatUnixTimestamp(row.date)}</Typography>
+        <Typography variant="subtitle2" noWrap={true}>
+          {formatUnixTimestamp(row.date)}
+        </Typography>
         <Typography variant="subtitle2">{row.cash == null ? 0 : `${row.cash} ₺`}</Typography>
       </TableCell>
 
