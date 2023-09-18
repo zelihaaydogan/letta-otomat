@@ -63,7 +63,29 @@ export default function AutomatDefinitions() {
       // Hata işleme burada yapılabilir, örneğin bir hata toast gösterilebilir.
     }
   };
+  function formatUnixTimestamp(timestamp) {
+    const months = [
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
+    ];
 
+    const date = new Date(timestamp * 1000);
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+
+    return `${day} ${months[monthIndex]} ${year}`;
+  }
   useEffect(() => {
     const getData = async () => {
       const response = await AutomatService.getNodeWithObjectList();
@@ -71,6 +93,7 @@ export default function AutomatDefinitions() {
         const updatedData = response.data.map((item) => ({
           ...item,
           id: item.nodeId,
+          date: formatUnixTimestamp(item.date),
         }));
         const updatedLabels = response.columnDict.map((item) => ({
           ...item,
