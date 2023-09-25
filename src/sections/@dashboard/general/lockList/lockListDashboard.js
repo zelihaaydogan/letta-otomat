@@ -133,9 +133,8 @@ export default function LockListDashboard({ data }) {
     push(PATH_DASHBOARD.invoice.edit(id));
   };
   const theme = useTheme();
-  console.log(data);
+
   data?.data.map((item) => {
-    console.log(item);
     item.id = item.deviceSerial;
   });
   return (

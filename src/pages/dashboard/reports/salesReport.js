@@ -45,6 +45,18 @@ import { ProductTableRow, ProductTableToolbar } from '../../../sections/@dashboa
 import SalesService from '../../../services/SalesService';
 import { Divider, CardHeader } from '@mui/material';
 import { BankingWidgetSummary } from '../../../sections/@dashboard/general/banking';
+import {
+  AnalyticsTasks,
+  AnalyticsNewsUpdate,
+  AnalyticsOrderTimeline,
+  AnalyticsCurrentVisits,
+  AnalyticsWebsiteVisits,
+  AnalyticsTrafficBySite,
+  AnalyticsWidgetSummary,
+  AnalyticsCurrentSubject,
+  AnalyticsConversionRates,
+  AnalyticsFilter,
+} from '../../../sections/@dashboard/general/analytics';
 
 // ----------------------------------------------------------------------
 
@@ -189,22 +201,53 @@ export default function SalesReport() {
         return '#FFC107';
     }
   };
+  const handleTitle = (value) => {
+    switch (value) {
+      case 'Cash':
+        return 'Nakit';
+      case 'Cashless':
+        return 'Kart';
+      default:
+        return 'Toplam';
+    }
+  };
+  const handleIcon = (value) => {
+    switch (value) {
+      case 'Cash':
+        return 'iconoir:hand-cash';
+      case 'Cashless':
+        return 'bi:credit-card';
+      default:
+        return 'fluent:money-24-filled';
+    }
+  };
 
   return (
     <Page title="Raporlar: Satış Raporları">
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <Grid container spacing={3}>
           {summary?.map((item, i) => (
-            <Grid key={`widget-${i}`} item xs={12} md={6}>
-              <BankingWidgetSummary
-                title={item.key === 'Cash' ? 'Nakit' : 'Kart'}
-                color="warning"
-                icon={'eva:diagonal-arrow-right-up-fill'}
-                percent={-0.5}
-                total={item.value}
-                chartData={item.graphList}
-              />
-            </Grid>
+            <>
+              <Grid item xs={12} sm={6} md={4}>
+                <AnalyticsWidgetSummary
+                  title={handleTitle(item.key)}
+                  total={item.value}
+                  color="success"
+                  icon={handleIcon(item.key)}
+                  lastUpdateTime={'Son 24 saat'}
+                />
+              </Grid>
+              {/* <Grid key={`widget-${i}`} item xs={12} md={6}>
+                <BankingWidgetSummary
+                  title={item.key === 'Cash' ? 'Nakit' : 'Kart'}
+                  color="warning"
+                  icon={'eva:diagonal-arrow-right-up-fill'}
+                  percent={-0.5}
+                  total={item.value}
+                  chartData={item.graphList}
+                />
+              </Grid> */}
+            </>
           ))}
         </Grid>
 

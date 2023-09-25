@@ -76,40 +76,72 @@ export default function GeneralAnalytics() {
 
     getData();
   }, []);
+  const [summary, setSummary] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await SalesService.getSalesSummary();
+        if (response.returnCode === 1) {
+          setSummary(response.data);
+        } else {
+          console.error('Veri alınamadı.');
+        }
+      } catch (error) {
+        console.error('Veri çekerken bir hata oluştu:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const handleTitle = (value) => {
+    switch (value) {
+      case 'Cash':
+        return 'Nakit';
+      case 'Cashless':
+        return 'Kart';
+      default:
+        return 'Toplam';
+    }
+  };
+  const handleIcon = (value) => {
+    switch (value) {
+      case 'Cash':
+        return 'iconoir:hand-cash';
+      case 'Cashless':
+        return 'bi:credit-card';
+      default:
+        return 'fluent:money-24-filled';
+    }
+  };
 
   return (
     <Page title="Genel: Raporlar & Analizler">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={4}>
-            <AnalyticsWidgetSummary
-              title="Toplam Kazanç"
-              total={714000}
-              color="success"
-              icon={'fluent:money-24-filled'}
-              lastUpdateTime={'Son 24 saat'}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <AnalyticsWidgetSummary
-              title="Kart-Kazanç"
-              total={1352831}
-              color="info"
-              icon={'bi:credit-card'}
-              lastUpdateTime={'Son 24 saat'}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <AnalyticsWidgetSummary
-              title="Nakit-Kazanç"
-              total={1723315}
-              color="warning"
-              icon={'iconoir:hand-cash'}
-              lastUpdateTime={'Son 24 saat'}
-            />
-          </Grid>
+          {summary?.map((item, i) => (
+            <>
+              <Grid item xs={12} sm={6} md={4}>
+                <AnalyticsWidgetSummary
+                  title={handleTitle(item.key)}
+                  total={item.value}
+                  color="success"
+                  icon={handleIcon(item.key)}
+                  lastUpdateTime={'Son 24 saat'}
+                />
+              </Grid>
+              {/* <Grid key={`widget-${i}`} item xs={12} md={6}>
+                <BankingWidgetSummary
+                  title={item.key === 'Cash' ? 'Nakit' : 'Kart'}
+                  color="warning"
+                  icon={'eva:diagonal-arrow-right-up-fill'}
+                  percent={-0.5}
+                  total={item.value}
+                  chartData={item.graphList}
+                />
+              </Grid> */}
+            </>
+          ))}
           {salesData && salesLabel && (
             <Grid item xs={12} sm={12} md={12}>
               <Card>
