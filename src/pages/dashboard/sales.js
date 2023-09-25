@@ -58,9 +58,27 @@ export default function GeneralAnalytics() {
         setSalesLabel(updatedLabels);
 
         const enumList = response.columnDict.find((item) => item.field === 'salesMethod').enumList.split(',');
+        const months = [
+          'Ocak',
+          'Şubat',
+          'Mart',
+          'Nisan',
+          'Mayıs',
+          'Haziran',
+          'Temmuz',
+          'Ağustos',
+          'Eylül',
+          'Ekim',
+          'Kasım',
+          'Aralık',
+        ];
 
         const updatedData = response.data.map((item) => {
-          // Satış yöntemini enumList'e göre güncelle
+          const date = new Date(item.epoch * 1000);
+          const day = date.getDate();
+          const monthIndex = date.getMonth();
+          const year = date.getFullYear();
+          item.epoch = `${day} ${months[monthIndex]} ${year}`;
           if (enumList[item.salesMethod]) {
             if (enumList[item.salesMethod] === 'Cashless') {
               item.salesMethod = 'Kart';
@@ -70,6 +88,7 @@ export default function GeneralAnalytics() {
           }
           return item;
         });
+
         setSalesData(updatedData);
       }
     };

@@ -117,6 +117,17 @@ BankingRecentTransitionsRow.propTypes = {
 };
 
 function BankingRecentTransitionsRow({ row, chartColor, chartData, tableData }) {
+  const handleIconConnect = (value) => {
+    switch (value) {
+      case 0:
+        return <Iconify icon={'el:ok'} width={16} height={16} color={'#2e7d32'} />;
+
+      case 1:
+        return <Iconify icon={'dashicons:no'} width={16} height={16} color={'#d32f2f'} />;
+      default:
+        return <Iconify icon={'pepicons-pop:line-x'} width={16} height={16} color={'#757575'} />;
+    }
+  };
   const theme = useTheme();
   return (
     <TableRow>
@@ -127,7 +138,29 @@ function BankingRecentTransitionsRow({ row, chartColor, chartData, tableData }) 
       </TableCell>
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ position: 'relative' }}>{renderAvatar(row.category, row.avatar)}</Box>
+          <Box sx={{ position: 'relative' }}>
+            {renderAvatar(row.category, row.avatar)}
+            <Box
+              sx={{
+                right: 0,
+                bottom: 0,
+                width: 18,
+                height: 18,
+                display: 'flex',
+                borderRadius: '50%',
+                position: 'absolute',
+                alignItems: 'center',
+                color: 'common.white',
+
+                justifyContent: 'center',
+                ...(row.type === 'Income' && {
+                  bgcolor: 'success.main',
+                }),
+              }}
+            >
+              {handleIconConnect(row.onlineStatus)}
+            </Box>
+          </Box>
           <Box sx={{ ml: 2 }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               {row.name}

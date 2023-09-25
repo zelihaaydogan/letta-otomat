@@ -50,8 +50,19 @@ BankingDetail.propTypes = {
 };
 
 export default function BankingDetail({ category, name, data, rating }) {
-  console.log(data);
   const { themeStretch } = useSettings();
+
+  const handleIconConnect = (value) => {
+    switch (value) {
+      case 0:
+        return <Iconify icon={'el:ok'} width={16} height={16} color={'#2e7d32'} />;
+
+      case 1:
+        return <Iconify icon={'dashicons:no'} width={16} height={16} color={'#d32f2f'} />;
+      default:
+        return <Iconify icon={'pepicons-pop:line-x'} width={16} height={16} color={'#757575'} />;
+    }
+  };
   return (
     <Container maxWidth={themeStretch ? false : 'xl'}>
       <Grid container spacing={2}>
@@ -75,22 +86,14 @@ export default function BankingDetail({ category, name, data, rating }) {
                             position: 'absolute',
                             alignItems: 'center',
                             color: 'common.white',
-                            bgcolor: 'error.main',
+
                             justifyContent: 'center',
                             ...(category === 'Income' && {
                               bgcolor: 'success.main',
                             }),
                           }}
                         >
-                          <Iconify
-                            icon={
-                              category.type === 'Income'
-                                ? 'pepicons-pencil:line-y-off'
-                                : 'fluent-mdl2:status-circle-error-x'
-                            }
-                            width={16}
-                            height={16}
-                          />
+                          {handleIconConnect(data.onlineStatus)}
                         </Box>
                       </Box>
                       <Box sx={{ ml: 2 }}>

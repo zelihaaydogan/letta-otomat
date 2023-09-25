@@ -32,7 +32,6 @@ export default function GeneralAnalytics() {
       try {
         const response = await AutomatService.getNodeWithObjectList();
         if (response.returnCode === 1) {
-          console.log(response.data);
           setAutomatData(response.data);
           setAutomatTableLabels(response.columnDict);
         } else {
