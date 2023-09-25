@@ -27,7 +27,7 @@ const IconWrapperStyle = styled('div')(({ theme }) => ({
 
 BankingWidgetSummary.propTypes = {
   chartData: PropTypes.arrayOf(PropTypes.number).isRequired,
-  color: PropTypes.oneOf(['primary', 'secondary', 'info', 'success', 'warning', 'error']),
+  color: PropTypes.oneOf(['primary', 'secondary', 'info', 'success', 'warning', 'error', 'inherit']),
   icon: PropTypes.string.isRequired,
   percent: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
@@ -90,7 +90,7 @@ export default function BankingWidgetSummary({
       <Stack spacing={1} sx={{ p: 3 }}>
         <Typography sx={{ typography: 'subtitle2' }}>{title}</Typography>
 
-        <Typography sx={{ typography: 'h3' }}>{fCurrency(total)}</Typography>
+        <Typography sx={{ typography: 'h3' }}>{`${fCurrency(total)} ₺`}</Typography>
         <Stack direction="row" alignItems="center" flexWrap="wrap">
           <Iconify width={20} height={20} icon={percent >= 0 ? 'eva:trending-up-fill' : 'eva:trending-down-fill'} />
 

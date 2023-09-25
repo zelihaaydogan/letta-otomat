@@ -53,11 +53,11 @@ const navConfig = [
       { title: 'Satışlar', path: PATH_DASHBOARD.general.sales, icon: ICONS.sales },
       {
         title: 'Raporlar',
-        path: PATH_DASHBOARD.user.root,
+        path: PATH_DASHBOARD.report.root,
         icon: ICONS.reports,
         children: [
-          { title: 'Satış Raporları', path: PATH_DASHBOARD.user.list },
-          { title: 'Ödeme Raporları', path: PATH_DASHBOARD.user.profile },
+          { title: 'Satış Raporları', path: PATH_DASHBOARD.report.salesReport },
+          { title: 'Ödeme Raporları', path: PATH_DASHBOARD.report.paymentReport },
 
           // { title: 'Arayüz İşlemleri', path: PATH_DASHBOARD.user.account },
           // { title: 'create', path: PATH_DASHBOARD.user.new },
@@ -65,12 +65,12 @@ const navConfig = [
           // { title: 'account', path: PATH_DASHBOARD.user.account },
         ],
       },
-      { title: 'Ürünler', path: PATH_DASHBOARD.user.cards, icon: ICONS.product },
+      { title: 'Ürünler', path: PATH_DASHBOARD.product, icon: ICONS.product },
 
       { title: 'Kullanıcılar', path: PATH_DASHBOARD.general.banking, icon: ICONS.banking },
 
       { title: 'Sistem ayarları', path: PATH_DASHBOARD.general.booking, icon: ICONS.user },
-      { title: 'Envanter', path: PATH_DASHBOARD.general.inventory, icon: ICONS.menuItem },
+      // { title: 'Envanter', path: PATH_DASHBOARD.general.inventory, icon: ICONS.menuItem },
     ],
   },
 

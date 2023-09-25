@@ -78,6 +78,7 @@ export default function AutomatDetail() {
   useEffect(() => {
     const getData = async () => {
       try {
+        console.log(id);
         const response = await AutomatService.GetNodeWithObjectByNodeId(id);
 
         if (response.returnCode === 1) {
@@ -93,7 +94,7 @@ export default function AutomatDetail() {
     };
 
     getData();
-  }, []);
+  }, [id]);
 
   const [rows, setRows] = useState([]);
   useEffect(() => {
@@ -125,7 +126,7 @@ export default function AutomatDetail() {
     <Page title="Otomat Detay">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Grid container spacing={2}>
-          {detailData?.data?.[0] && (
+          {id && detailData?.data?.[0] && (
             <Grid item xs={12} md={12}>
               <BankingDetail
                 category={detailData.data[0].category}

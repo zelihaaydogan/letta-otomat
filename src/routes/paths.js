@@ -41,7 +41,7 @@ export const PATH_DASHBOARD = {
     analytic: path(ROOTS_DASHBOARD, '/automat'),
     automatDefinitions: path(ROOTS_DASHBOARD, '/definitions'),
     booking: path(ROOTS_DASHBOARD, '/systemSettings'),
-    inventory: path(ROOTS_DASHBOARD, '/inventory'),
+    // inventory: path(ROOTS_DASHBOARD, '/inventory'),
     sales: path(ROOTS_DASHBOARD, '/sales'),
     banking: path(ROOTS_DASHBOARD, '/listUsers'),
   },
@@ -51,8 +51,6 @@ export const PATH_DASHBOARD = {
     detail: path(ROOTS_DASHBOARD, '/automat/detail'),
     list: path(ROOTS_DASHBOARD, '/automat/list'),
     definitions: path(ROOTS_DASHBOARD, '/automat/definitions'),
-    profile: path(ROOTS_DASHBOARD, '/reports/completed'),
-    account: path(ROOTS_DASHBOARD, '/reports/allevents'),
   },
   user: {
     root: path(ROOTS_DASHBOARD, '/user'),
@@ -62,6 +60,12 @@ export const PATH_DASHBOARD = {
     profile: path(ROOTS_DASHBOARD, '/reports/completed'),
     account: path(ROOTS_DASHBOARD, '/reports/allevents'),
   },
+  report: {
+    root: path(ROOTS_DASHBOARD, '/reports'),
+    salesReport: path(ROOTS_DASHBOARD, '/reports/salesReport'),
+    paymentReport: path(ROOTS_DASHBOARD, '/reports/paymentReport'),
+  },
+  product: path(ROOTS_DASHBOARD, '/product'),
 };
 
 export const PATH_DOCS = 'https://docs-minimals.vercel.app/introduction';

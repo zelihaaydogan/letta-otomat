@@ -8,19 +8,17 @@ import {
   Box,
   Card,
   Table,
-  Button,
   Switch,
-  Tooltip,
   TableBody,
   Container,
-  IconButton,
   TableContainer,
   TablePagination,
   FormControlLabel,
+  Grid,
 } from '@mui/material';
 // redux
 import { useDispatch, useSelector } from '../../../redux/store';
-import { getProducts } from '../../../redux/slices/product';
+
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
@@ -41,27 +39,33 @@ import {
   TableSelectedActions,
 } from '../../../components/table';
 // sections
-import { ProductTableRow, ProductTableToolbar } from '../../../sections/@dashboard/e-commerce/product-list';
+import { PaymentTableRow, ProductTableToolbar } from '../../../sections/@dashboard/e-commerce/product-list';
+import SalesService from '../../../services/SalesService';
+import { Divider, CardHeader } from '@mui/material';
+import { BankingWidgetSummary } from '../../../sections/@dashboard/general/banking';
+import { BookingIllustration, CheckInIllustration, CheckOutIllustration } from '../../../assets';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Product', align: 'left' },
-  { id: 'createdAt', label: 'Create at', align: 'left' },
-  { id: 'inventoryType', label: 'Status', align: 'center', width: 180 },
-  { id: 'price', label: 'Price', align: 'right' },
-  { id: '' },
+  { id: 'bankName', label: 'Banka Adı', align: 'left' },
+  { id: 'status', label: 'Durum', align: 'left' },
+  { id: 'price', label: 'Ücret', align: 'left', width: 180 },
+  { id: 'cardLastFourNo', label: 'Kart', align: 'left', width: 180 },
+  { id: 'cardName', label: 'Kart Sahibi', align: 'left', width: 180 },
+
+  // { id: '' },
 ];
 
 // ----------------------------------------------------------------------
 
-EcommerceProductList.getLayout = function getLayout(page) {
+SalesReport.getLayout = function getLayout(page) {
   return <Layout>{page}</Layout>;
 };
 
 // ----------------------------------------------------------------------
 
-export default function EcommerceProductList() {
+export default function SalesReport() {
   const {
     dense,
     page,
@@ -96,15 +100,53 @@ export default function EcommerceProductList() {
   const [filterName, setFilterName] = useState('');
 
   useEffect(() => {
-    dispatch(getProducts());
-  }, [dispatch]);
+    const fetchData = async () => {
+      try {
+        const response = await SalesService.getPaymentReport();
+        if (response.returnCode === 1) {
+          setTableData(response.data);
+        } else {
+          console.error('Veri alınamadı.');
+        }
+      } catch (error) {
+        console.error('Veri çekerken bir hata oluştu:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const [payment, setPayment] = useState([]);
 
   useEffect(() => {
-    if (products.length) {
-      setTableData(products);
-      console.log(products);
-    }
-  }, [products]);
+    const fetchData = async () => {
+      try {
+        const response = await SalesService.getPaymentSummary();
+        if (response.returnCode === 1) {
+          const enumList = response.columnDict.find((item) => item.field === 'salesMethod').enumList.split(',');
+
+          const updatedData = response.data.map((item) => {
+            // Satış yöntemini enumList'e göre güncelle
+            if (enumList[item.salesMethod]) {
+              if (enumList[item.salesMethod] === 'Cashless') {
+                item.salesMethod = 'Kart';
+              } else {
+                item.salesMethod = 'Nakit';
+              }
+            }
+            return item;
+          });
+          setPayment(updatedData);
+        } else {
+          console.error('Veri alınamadı.');
+        }
+      } catch (error) {
+        console.error('Veri çekerken bir hata oluştu:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleFilterName = (filterName) => {
     setFilterName(filterName);
@@ -138,29 +180,43 @@ export default function EcommerceProductList() {
   const isNotFound = (!dataFiltered.length && !!filterName) || (!isLoading && !dataFiltered.length);
 
   return (
-    <Page title="Ecommerce: Product List">
+    <Page title="Raporlar: Ödeme Raporları">
       <Container maxWidth={themeStretch ? false : 'lg'}>
-        {/* <HeaderBreadcrumbs
-          heading="Product List"
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            {
-              name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
-            },
-            { name: 'Product List' },
-          ]}
-          action={
-            <NextLink href={PATH_DASHBOARD.eCommerce.new} passHref>
-              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-                New Product
-              </Button>
-            </NextLink>
-          }
-        /> */}
-
-        <Card>
-          <ProductTableToolbar filterName={filterName} onFilterName={handleFilterName} />
+        <Grid container spacing={3}>
+          {payment?.map((item, i) => (
+            <Grid key={`widget-${i}`} item xs={12} md={3}>
+              <BankingWidgetSummary
+                title={
+                  item.key === 'Success'
+                    ? 'Başarılı'
+                    : item.key === 'Failed'
+                    ? 'Başarısız'
+                    : item.key === 'InsufficientFunds'
+                    ? 'Yetersiz Bakiye'
+                    : item.key === 'None'
+                    ? 'Bilinmiyor'
+                    : 'Diğer'
+                }
+                color={
+                  item.key === 'Success'
+                    ? 'success'
+                    : item.key == 'Failed'
+                    ? 'error'
+                    : item.key == 'InsufficientFunds'
+                    ? 'warning'
+                    : 'secondary'
+                }
+                icon={'eva:diagonal-arrow-right-up-fill'}
+                percent={-0.5}
+                total={item.value}
+                chartData={item.graphList}
+              />
+            </Grid>
+          ))}
+        </Grid>
+        <Card sx={{ mt: '18px' }}>
+          <CardHeader title={'Ödeme Raporları'} subheader={''} sx={{ mb: 3 }} />
+          <ProductTableToolbar filterName={filterName} onFilterName={handleFilterName} sx={{ width: '100px' }} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 960, position: 'relative' }}>
@@ -175,13 +231,13 @@ export default function EcommerceProductList() {
                       tableData.map((row) => row.id)
                     )
                   }
-                  actions={
-                    <Tooltip title="Delete">
-                      <IconButton color="primary" onClick={() => handleDeleteRows(selected)}>
-                        <Iconify icon={'eva:trash-2-outline'} />
-                      </IconButton>
-                    </Tooltip>
-                  }
+                  // actions={
+                  //   // <Tooltip title="Delete">
+                  //   //   <IconButton color="primary" onClick={() => handleDeleteRows(selected)}>
+                  //   //     <Iconify icon={'eva:trash-2-outline'} />
+                  //   //   </IconButton>
+                  //   // </Tooltip>
+                  // }
                 />
               )}
 
@@ -206,7 +262,7 @@ export default function EcommerceProductList() {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) =>
                       row ? (
-                        <ProductTableRow
+                        <PaymentTableRow
                           key={row.id}
                           row={row}
                           selected={selected.includes(row.id)}
@@ -240,7 +296,7 @@ export default function EcommerceProductList() {
 
             <FormControlLabel
               control={<Switch checked={dense} onChange={onChangeDense} />}
-              label="Dense"
+              label="Yoğunluk"
               sx={{ px: 3, py: 1.5, top: 0, position: { md: 'absolute' } }}
             />
           </Box>
@@ -264,7 +320,20 @@ function applySortFilter({ tableData, comparator, filterName }) {
   tableData = stabilizedThis.map((el) => el[0]);
 
   if (filterName) {
-    tableData = tableData.filter((item) => item.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    const filterText = filterName.toLowerCase();
+    tableData = tableData.filter((item) => {
+      // Bu döngü, her bir öğenin her bir kolonunu kontrol eder
+      for (const key in item) {
+        if (Object.hasOwnProperty.call(item, key)) {
+          // Kolon değerini küçük harf yaparak ve arama terimiyle karşılaştırarak arama yapar
+          const columnValue = item[key].toString().toLowerCase();
+          if (columnValue.indexOf(filterText) !== -1) {
+            return true; // Eşleşme bulundu, öğeyi sakla
+          }
+        }
+      }
+      return false; // Eşleşme bulunamadı, öğeyi filtrele
+    });
   }
 
   return tableData;

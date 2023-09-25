@@ -29,13 +29,13 @@ import { useEffect, useState } from 'react';
 import { GridToolbar, DataGrid } from '@mui/x-data-grid';
 // ----------------------------------------------------------------------
 
-GeneralAnalytics.getLayout = function getLayout(page) {
+Product.getLayout = function getLayout(page) {
   return <Layout>{page}</Layout>;
 };
 
 // ----------------------------------------------------------------------
 
-export default function GeneralAnalytics() {
+export default function Product() {
   const theme = useTheme();
 
   const { themeStretch } = useSettings();
@@ -47,101 +47,32 @@ export default function GeneralAnalytics() {
       const response = await SalesService.getSales();
 
       if (response.returnCode === 1) {
+        setSalesData(response.data);
         const updatedLabels = response.columnDict
           .filter((item) => item.field !== 'id')
           .map((item) => ({
             ...item,
+
             resizable: false,
             flex: 1,
             minWidth: 220,
           }));
         setSalesLabel(updatedLabels);
-
-        const enumList = response.columnDict.find((item) => item.field === 'salesMethod').enumList.split(',');
-
-        const updatedData = response.data.map((item) => {
-          // Satış yöntemini enumList'e göre güncelle
-          if (enumList[item.salesMethod]) {
-            if (enumList[item.salesMethod] === 'Cashless') {
-              item.salesMethod = 'Kart';
-            } else {
-              item.salesMethod = 'Nakit';
-            }
-          }
-          return item;
-        });
-        setSalesData(updatedData);
       }
     };
 
     getData();
   }, []);
+  useEffect(() => {
+    // salesData ve salesLabel değerleri güncellendiğinde çalışacak olan kod
+    console.log('salesData:', salesData);
+    console.log('salesLabel:', salesLabel);
+  }, [salesData, salesLabel]);
 
   return (
-    <Page title="Genel: Raporlar & Analizler">
+    <Page title="Genel: Ürünler">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={4}>
-            <AnalyticsWidgetSummary
-              title="Toplam Kazanç"
-              total={714000}
-              color="success"
-              icon={'fluent:money-24-filled'}
-              lastUpdateTime={'Son 24 saat'}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <AnalyticsWidgetSummary
-              title="Kart-Kazanç"
-              total={1352831}
-              color="info"
-              icon={'bi:credit-card'}
-              lastUpdateTime={'Son 24 saat'}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <AnalyticsWidgetSummary
-              title="Nakit-Kazanç"
-              total={1723315}
-              color="warning"
-              icon={'iconoir:hand-cash'}
-              lastUpdateTime={'Son 24 saat'}
-            />
-          </Grid>
-          {salesData && salesLabel && (
-            <Grid item xs={12} sm={12} md={12}>
-              <Card>
-                <CardHeader title="Satışlar" subheader="" sx={{ mb: 3 }} />
-                {/* Card bileşenini iç içe yerleştirin */}
-                <DataGrid
-                  rows={salesData}
-                  columns={salesLabel}
-                  rowsPerPageOptions={[5, 10, 25]}
-                  sortingOrder={['desc', 'asc']}
-                  initialState={{
-                    ...salesData.initialState,
-                    pagination: {
-                      pageSize: 10,
-                    },
-                    sorting: {
-                      sortModel: [
-                        {
-                          field: 'commodity',
-                          sort: 'asc',
-                        },
-                      ],
-                    },
-                  }}
-                  components={{ Toolbar: GridToolbar }}
-                  disableSelectionOnClick
-                  autoHeight={true}
-                />
-              </Card>
-            </Grid>
-          )}
-
           {/* <Grid item xs={12} md={6} lg={12}>
             <AnalyticsConversionRates
               title="Conversion Rates"

@@ -50,11 +50,12 @@ BankingDetail.propTypes = {
 };
 
 export default function BankingDetail({ category, name, data, rating }) {
+  console.log(data);
   const { themeStretch } = useSettings();
   return (
     <Container maxWidth={themeStretch ? false : 'xl'}>
       <Grid container spacing={2}>
-        {data && category && name && (
+        {data && (
           <Grid key={`widget-${name}`} item xs={12} md={12}>
             <Card spacing={3}>
               <CardContent>

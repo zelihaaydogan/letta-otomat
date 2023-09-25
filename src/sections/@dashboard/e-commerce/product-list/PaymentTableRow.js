@@ -24,11 +24,12 @@ import {
 } from '../../../../sections/@dashboard/general/banking';
 import { _bankingContacts, _bankingCreditCard, _bankingRecentTransitions } from '../../../../_mock';
 import { styled } from '@mui/material/styles';
+import Chip from '@mui/material/Chip';
 //
 
 // ----------------------------------------------------------------------
 
-ProductTableRow.propTypes = {
+PaymentTableRow.propTypes = {
   row: PropTypes.object,
   selected: PropTypes.bool,
   onEditRow: PropTypes.func,
@@ -49,12 +50,12 @@ const CardItemStyle = styled('div')(({ theme }) => ({
   justifyContent: 'space-between',
   borderRadius: '10px',
 }));
-export default function ProductTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow, cardNumber, cardValid }) {
+export default function PaymentTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow, cardNumber, cardValid }) {
   const theme = useTheme();
 
   const {
-    automatName,
-    salesMethod,
+    bankName,
+    status,
     createdAt,
     inventoryType,
     price,
@@ -85,11 +86,15 @@ export default function ProductTableRow({ row, selected, onEditRow, onSelectRow,
       <TableCell padding="checkbox">
         <Checkbox checked={selected} onClick={onSelectRow} />
       </TableCell>
-      <TableCell>{automatName}</TableCell>
-      <TableCell>{salesMethod}</TableCell>
-      <TableCell>{price}</TableCell>
-      <TableCell sx={{ alignItems: 'center' }}>{productName}</TableCell>
-      <TableCell sx={{ display: 'flex', alignItems: 'center' }}>{productBrand}</TableCell>
+      <TableCell>{bankName}</TableCell>
+
+      <TableCell>{renderStatus(status)}</TableCell>
+      <TableCell>{`${price} ₺`}</TableCell>
+      <TableCell>
+        <Typography variant="subtitle1" gutterBottom>{`********${cardLastFourNo}`}</Typography>
+      </TableCell>
+
+      <TableCell sx={{ alignItems: 'center' }}>{cardName}</TableCell>
 
       {/* <TableCell>{fDate(createdAt)}</TableCell> */}
       {/* <TableCell sx={{ display: 'flex', alignItems: 'center' }}></TableCell> */}
@@ -109,4 +114,29 @@ export default function ProductTableRow({ row, selected, onEditRow, onSelectRow,
       {/* <TableCell align="right">{fCurrency(price)}</TableCell> */}
     </TableRow>
   );
+}
+function renderStatus(status) {
+  if (status === 1) {
+    return (
+      <Stack direction="row" spacing={1}>
+        <Chip label="Başarılı" color="success" />
+      </Stack>
+    );
+  }
+  if (status === 2) {
+    return (
+      <Stack direction="row" spacing={1}>
+        <Chip label="Başarısız" color="error" />
+      </Stack>
+    );
+  } else {
+    return (
+      <Stack direction="row" spacing={1}>
+        <Chip label="Başarılı" color="success" />
+      </Stack>
+    );
+  }
+  // return avatar ? (
+  //   <Avatar alt={category} src={avatar} sx={{ width: 48, height: 48, boxShadow: (theme) => theme.customShadows.z8 }} />
+  // ) : null;
 }

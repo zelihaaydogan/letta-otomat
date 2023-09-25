@@ -17,7 +17,7 @@ export default function ProductTableToolbar({ filterName, onFilterName }) {
       <TextField
         value={filterName}
         onChange={(event) => onFilterName(event.target.value)}
-        placeholder="Search product..."
+        placeholder="Arama Yapın.."
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -25,6 +25,7 @@ export default function ProductTableToolbar({ filterName, onFilterName }) {
             </InputAdornment>
           ),
         }}
+        fullWidth
       />
 
       <Tooltip title="Filter list">

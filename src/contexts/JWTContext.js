@@ -117,12 +117,7 @@ function AuthProvider({ children }) {
 
   const login = async (data) => {
     const response = await AuthService.login(data);
-    console.log(response);
-    // var user = {
-    //   id: 1,
-    //   name: 'Zeliha',
-    //   email: 'zeliha@gmail.com',
-    // };
+
     if (!response || (typeof response.type !== 'undefined' && response.type === 'Failed')) return response;
     setSession(response);
     dispatch({

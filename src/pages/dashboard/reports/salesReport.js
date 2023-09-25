@@ -10,7 +10,7 @@ import {
   Table,
   Button,
   Switch,
-  Tooltip,
+  Grid,
   TableBody,
   Container,
   IconButton,
@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 // redux
 import { useDispatch, useSelector } from '../../../redux/store';
-import { getProducts } from '../../../redux/slices/product';
+
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // hooks
@@ -42,26 +42,31 @@ import {
 } from '../../../components/table';
 // sections
 import { ProductTableRow, ProductTableToolbar } from '../../../sections/@dashboard/e-commerce/product-list';
+import SalesService from '../../../services/SalesService';
+import { Divider, CardHeader } from '@mui/material';
+import { BankingWidgetSummary } from '../../../sections/@dashboard/general/banking';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Product', align: 'left' },
-  { id: 'createdAt', label: 'Create at', align: 'left' },
-  { id: 'inventoryType', label: 'Status', align: 'center', width: 180 },
-  { id: 'price', label: 'Price', align: 'right' },
-  { id: '' },
+  { id: 'Otomat Adı', label: 'Otomat Adı', align: 'left' },
+  { id: 'salesMethod', label: 'Ödeme Yöntemi', align: 'left' },
+  { id: 'price', label: 'Ücret', align: 'left' },
+  { id: 'productName', label: 'Ürün Adı', align: 'left', width: 180 },
+  { id: 'productBrand', label: 'Ürünün Markası', align: 'left', width: 180 },
+
+  // { id: '' },
 ];
 
 // ----------------------------------------------------------------------
 
-EcommerceProductList.getLayout = function getLayout(page) {
+SalesReport.getLayout = function getLayout(page) {
   return <Layout>{page}</Layout>;
 };
 
 // ----------------------------------------------------------------------
 
-export default function EcommerceProductList() {
+export default function SalesReport() {
   const {
     dense,
     page,
@@ -96,15 +101,53 @@ export default function EcommerceProductList() {
   const [filterName, setFilterName] = useState('');
 
   useEffect(() => {
-    dispatch(getProducts());
-  }, [dispatch]);
+    const fetchData = async () => {
+      try {
+        const response = await SalesService.getSalesReport();
+        if (response.returnCode === 1) {
+          const enumList = response.columnDict.find((item) => item.field === 'salesMethod').enumList.split(',');
+
+          const updatedData = response.data.map((item) => {
+            // Satış yöntemini enumList'e göre güncelle
+            if (enumList[item.salesMethod]) {
+              if (enumList[item.salesMethod] === 'Cashless') {
+                item.salesMethod = 'Kart';
+              } else {
+                item.salesMethod = 'Nakit';
+              }
+            }
+            return item;
+          });
+          setTableData(updatedData);
+        } else {
+          console.error('Veri alınamadı.');
+        }
+      } catch (error) {
+        console.error('Veri çekerken bir hata oluştu:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const [summary, setSummary] = useState([]);
 
   useEffect(() => {
-    if (products.length) {
-      setTableData(products);
-      console.log(products);
-    }
-  }, [products]);
+    const fetchData = async () => {
+      try {
+        const response = await SalesService.getSalesSummary();
+        if (response.returnCode === 1) {
+          setSummary(response.data);
+        } else {
+          console.error('Veri alınamadı.');
+        }
+      } catch (error) {
+        console.error('Veri çekerken bir hata oluştu:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleFilterName = (filterName) => {
     setFilterName(filterName);
@@ -136,31 +179,38 @@ export default function EcommerceProductList() {
   const denseHeight = dense ? 60 : 80;
 
   const isNotFound = (!dataFiltered.length && !!filterName) || (!isLoading && !dataFiltered.length);
+  const handleBgColor = (value) => {
+    switch (value) {
+      case 'success':
+        return '#54D62C';
+      case 'error':
+        return '#FF4842';
+      default:
+        return '#FFC107';
+    }
+  };
 
   return (
-    <Page title="Ecommerce: Product List">
+    <Page title="Raporlar: Satış Raporları">
       <Container maxWidth={themeStretch ? false : 'lg'}>
-        {/* <HeaderBreadcrumbs
-          heading="Product List"
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            {
-              name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
-            },
-            { name: 'Product List' },
-          ]}
-          action={
-            <NextLink href={PATH_DASHBOARD.eCommerce.new} passHref>
-              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-                New Product
-              </Button>
-            </NextLink>
-          }
-        /> */}
+        <Grid container spacing={3}>
+          {summary?.map((item, i) => (
+            <Grid key={`widget-${i}`} item xs={12} md={6}>
+              <BankingWidgetSummary
+                title={item.key === 'Cash' ? 'Nakit' : 'Kart'}
+                color="warning"
+                icon={'eva:diagonal-arrow-right-up-fill'}
+                percent={-0.5}
+                total={item.value}
+                chartData={item.graphList}
+              />
+            </Grid>
+          ))}
+        </Grid>
 
-        <Card>
-          <ProductTableToolbar filterName={filterName} onFilterName={handleFilterName} />
+        <Card sx={{ mt: 3 }}>
+          <CardHeader title={'Satış Raporları'} subheader={''} sx={{ mb: 3 }} />
+          <ProductTableToolbar filterName={filterName} onFilterName={handleFilterName} sx={{ width: '100px' }} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 960, position: 'relative' }}>
@@ -175,13 +225,13 @@ export default function EcommerceProductList() {
                       tableData.map((row) => row.id)
                     )
                   }
-                  actions={
-                    <Tooltip title="Delete">
-                      <IconButton color="primary" onClick={() => handleDeleteRows(selected)}>
-                        <Iconify icon={'eva:trash-2-outline'} />
-                      </IconButton>
-                    </Tooltip>
-                  }
+                  // actions={
+                  //   // <Tooltip title="Delete">
+                  //   //   <IconButton color="primary" onClick={() => handleDeleteRows(selected)}>
+                  //   //     <Iconify icon={'eva:trash-2-outline'} />
+                  //   //   </IconButton>
+                  //   // </Tooltip>
+                  // }
                 />
               )}
 
@@ -240,7 +290,7 @@ export default function EcommerceProductList() {
 
             <FormControlLabel
               control={<Switch checked={dense} onChange={onChangeDense} />}
-              label="Dense"
+              label="Yoğunluk"
               sx={{ px: 3, py: 1.5, top: 0, position: { md: 'absolute' } }}
             />
           </Box>
@@ -264,7 +314,20 @@ function applySortFilter({ tableData, comparator, filterName }) {
   tableData = stabilizedThis.map((el) => el[0]);
 
   if (filterName) {
-    tableData = tableData.filter((item) => item.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1);
+    const filterText = filterName.toLowerCase();
+    tableData = tableData.filter((item) => {
+      // Bu döngü, her bir öğenin her bir kolonunu kontrol eder
+      for (const key in item) {
+        if (Object.hasOwnProperty.call(item, key)) {
+          // Kolon değerini küçük harf yaparak ve arama terimiyle karşılaştırarak arama yapar
+          const columnValue = item[key].toString().toLowerCase();
+          if (columnValue.indexOf(filterText) !== -1) {
+            return true; // Eşleşme bulundu, öğeyi sakla
+          }
+        }
+      }
+      return false; // Eşleşme bulunamadı, öğeyi filtrele
+    });
   }
 
   return tableData;
