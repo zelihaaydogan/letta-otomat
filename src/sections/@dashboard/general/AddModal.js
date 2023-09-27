@@ -55,7 +55,7 @@ export default function AddModal({ isOpen, onClose, onAdd, selectedRowData, cust
         }}
       >
         <Card>
-          <CardHeader title="Otomat Bilgilerini Güncelle" subheader="" sx={{ mb: 3 }} />
+          <CardHeader title="Otomat Bilgilerini Giriniz" subheader="" sx={{ mb: 3 }} />
           <form onSubmit={handleUpdateClick}>
             <Grid container sx={{ mr: 2 }}>
               <Grid item xs={12}>

@@ -88,6 +88,7 @@ export default function ProductTableRow({ row, selected, onEditRow, onSelectRow,
       <TableCell>{automatName}</TableCell>
       <TableCell>{salesMethod}</TableCell>
       <TableCell>{price}</TableCell>
+      <TableCell>{formatUnixTimestamp(row.epoch)}</TableCell>
       <TableCell sx={{ alignItems: 'center' }}>{productName}</TableCell>
       <TableCell sx={{ display: 'flex', alignItems: 'center' }}>{productBrand}</TableCell>
 
@@ -109,4 +110,30 @@ export default function ProductTableRow({ row, selected, onEditRow, onSelectRow,
       {/* <TableCell align="right">{fCurrency(price)}</TableCell> */}
     </TableRow>
   );
+}
+function formatUnixTimestamp(timestamp) {
+  const months = [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
+  ];
+
+  const date = new Date(timestamp * 1000);
+  const day = date.getDate();
+  const monthIndex = date.getMonth();
+  const year = date.getFullYear();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+
+  return `${day} ${months[monthIndex]} ${year} ${hours}:${minutes}:${seconds}`;
 }

@@ -18,6 +18,9 @@ class AutomatService {
   deleteAutomat(AutomatId) {
     return BaseService.deleteData(`api/Automat/DeleteAutomat?AutomatId=${AutomatId}`);
   }
+  getAutomatSlots(AutomatId) {
+    return BaseService.postData(`api/AutomatSlots/GetAutomatSlots?AutomatId=${AutomatId}`);
+  }
 }
 
 export default new AutomatService();

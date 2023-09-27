@@ -63,6 +63,7 @@ export default function GeneralAnalytics() {
                 },
                 { id: 'date', label: 'Satış / Son Ziyaret / Biriken Nakit', width: 380 },
                 { id: 'amount', label: 'Alarm' },
+                { id: 'status', label: 'Sıcaklık' },
                 { id: 'status', label: 'Stok Seviyesi' },
                 { id: 'status', label: 'Slot1' },
                 { id: 'status', label: 'Slot2' },

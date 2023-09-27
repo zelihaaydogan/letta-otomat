@@ -186,6 +186,11 @@ function BankingRecentTransitionsRow({ row, chartColor, chartData, tableData }) 
       </TableCell>
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ position: 'relative' }}>{`${row.temperature} °C`}</Box>
+        </Box>
+      </TableCell>
+      <TableCell>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ position: 'relative' }}>{renderSlotStatus(row.percent)}</Box>
         </Box>
       </TableCell>

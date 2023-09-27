@@ -1,32 +1,27 @@
 // @mui
-import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Card, CardHeader } from '@mui/material';
+import { Card, Button, Container } from '@mui/material';
+// redux
 // hooks
 import useSettings from '../../hooks/useSettings';
 // layouts
 import Layout from '../../layouts';
-// _mock_
-import { _analyticPost, _analyticOrderTimeline, _analyticTraffic } from '../../_mock';
 // components
 import Page from '../../components/Page';
-// sections
-import {
-  AnalyticsTasks,
-  AnalyticsNewsUpdate,
-  AnalyticsOrderTimeline,
-  AnalyticsCurrentVisits,
-  AnalyticsWebsiteVisits,
-  AnalyticsTrafficBySite,
-  AnalyticsWidgetSummary,
-  AnalyticsCurrentSubject,
-  AnalyticsConversionRates,
-  AnalyticsFilter,
-} from '../../sections/@dashboard/general/analytics';
-import { Analytics } from '@mui/icons-material';
-
-import SalesService from '../../services/SalesService';
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import { Divider, CardHeader } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { GridToolbar, DataGrid } from '@mui/x-data-grid';
+import ProductService from '../../services/ProductService';
+import { GridToolbar } from '@mui/x-data-grid';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import UpdateIcon from '@mui/icons-material/Update';
+import AddModal from '../../sections/@dashboard/general/AddModal';
+import UpdateModal from '../../sections/@dashboard/general/UpdateModal';
+import { successToast, errorToast } from '../../utils/toast';
+import { DataGrid } from '@mui/x-data-grid';
+import { visuallyHidden } from '@mui/utils';
+
 // ----------------------------------------------------------------------
 
 Product.getLayout = function getLayout(page) {
@@ -34,179 +29,246 @@ Product.getLayout = function getLayout(page) {
 };
 
 // ----------------------------------------------------------------------
-
 export default function Product() {
-  const theme = useTheme();
-
   const { themeStretch } = useSettings();
-  const [salesData, setSalesData] = useState();
-  const [salesLabel, setSalesLabel] = useState();
+  const [automatData, setAutomatData] = useState();
+  const [automatTableLabels, setAutomatTableLabels] = useState();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState([]);
 
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const handleOpenUpdateModal = () => {
+    setIsUpdateModalOpen(true);
+  };
+  const handleCloseUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+  };
+
+  const handleUpdate = async (e) => {
+    try {
+      const form = new FormData(e.target);
+      const formData = Object.fromEntries(form.entries());
+
+      const updateResponse = await ProductService.updateProduct(formData);
+      if (updateResponse.type === 'Failed') {
+        errorToast(updateResponse.data);
+      } else {
+        successToast(updateResponse.data);
+      }
+
+      setIsUpdateModalOpen(false);
+    } catch (error) {
+      console.error('Güncelleme sırasında bir hata oluştu:', error);
+    }
+  };
+  function formatUnixTimestamp(timestamp) {
+    const months = [
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
+    ];
+
+    const date = new Date(timestamp * 1000);
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+
+    return `${day} ${months[monthIndex]} ${year}`;
+  }
   useEffect(() => {
     const getData = async () => {
-      const response = await SalesService.getSales();
-
-      if (response.returnCode === 1) {
-        setSalesData(response.data);
-        const updatedLabels = response.columnDict
-          .filter((item) => item.field !== 'id')
-          .map((item) => ({
-            ...item,
-
-            resizable: false,
-            flex: 1,
-            minWidth: 220,
-          }));
-        setSalesLabel(updatedLabels);
+      const response = await ProductService.getAllProducts();
+      if (response.returnCode === -1) {
+        setAutomatData(response.data);
+        setAutomatTableLabels(response.columnDict);
       }
     };
 
     getData();
   }, []);
-  useEffect(() => {
-    // salesData ve salesLabel değerleri güncellendiğinde çalışacak olan kod
-    console.log('salesData:', salesData);
-    console.log('salesLabel:', salesLabel);
-  }, [salesData, salesLabel]);
+
+  const handleSelectRow = (selectedRowIds) => {
+    if (selectedRowIds.length > 0) {
+      // İlk seçili satırın ID'sini alın
+      const selectedRowId = selectedRowIds[0];
+
+      // Seçili satırın verilerini bulmak için ID'yi kullanın
+      const selectedRowDatas = automatData.find((row) => row.id === selectedRowId);
+
+      setSelectedRowId(selectedRowIds);
+      setSelectedRowData(selectedRowDatas);
+    } else {
+      // Hiçbir satır seçilmediyse, seçili satırı sıfırlayın
+      setSelectedRowId([]);
+      setSelectedRowData(null);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+  const handleAdd = async () => {
+    const form = new FormData(event.target);
+    const formData = Object.fromEntries(form.entries());
+    const updateResponse = await ProductService.addProduct(formData);
+    if (updateResponse.type == 'Failed') {
+      errorToast(updateResponse.data);
+      setIsAddModalOpen(false);
+    } else {
+      // handleFetchDoors();
+      successToast(updateResponse.data);
+      setIsAddModalOpen(false);
+    }
+    if (!updateResponse) return;
+  };
+
+  const handleDelete = async (e) => {
+    const updateResponse = await ProductService.deleteProduct(selectedRowId);
+    if (updateResponse.type == 'Failed') {
+      errorToast(updateResponse.data);
+      setIsUpdateModalOpen(false);
+    } else {
+      // handleFetchDoors();
+      successToast(updateResponse.data);
+      setIsUpdateModalOpen(false);
+    }
+    if (!updateResponse) return;
+  };
+
+  const customLabels = {
+    nodeId: 'OtomatId',
+    deviceId: 'Cihaz Seri No',
+    nodeType: 'Otomat Tipi',
+    name: 'Otomat Adı',
+    city: 'Şehir',
+    town: 'İlçe',
+    address: 'Adres',
+    latitude: 'Enlem',
+    longitude: 'Boylam',
+    group1: 'Group 1',
+    group2: 'Group 2',
+    nodeBrand: 'Otomat Marka',
+    nodeModel: 'Otomat Model',
+    description: 'Açıklama',
+  };
+  const addLabels = {
+    nodeId: null,
+    name: null,
+    deviceId: null,
+    city: null,
+    town: null,
+    latitude: null,
+    longitude: null,
+    address: null,
+    group1: null,
+    group2: null,
+    nodeBrand: null,
+    nodeModel: null,
+    description: null,
+  };
 
   return (
-    <Page title="Genel: Ürünler">
+    <Page title="Ürünler">
       <Container maxWidth={themeStretch ? false : 'xl'}>
-        <Grid container spacing={3}>
-          {/* <Grid item xs={12} md={6} lg={12}>
-            <AnalyticsConversionRates
-              title="Conversion Rates"
-              subheader="(+43%) than last year"
-              chartData={[
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-                { label: 'South Korea', value: 690 },
-                { label: 'Netherlands', value: 1100 },
-                { label: 'United States', value: 1200 },
-                { label: 'United Kingdom', value: 1380 },
-              ]}
-            />
-          </Grid>
+        <Card>
+          <CardHeader
+            title={'Ürünler'}
+            subheader={''}
+            sx={{ mb: 3 }}
+            action={
+              <Box sx={{ display: 'flex', gap: '8px' }}>
+                <Button variant="outlined" startIcon={<AddIcon />} onClick={handleOpenAddModal}>
+                  Ekle
+                </Button>
+                {selectedRowId.length != 0 && selectedRowId.length < 2 && (
+                  <>
+                    {console.log(selectedRowId)}
+                    <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>
+                      Sil
+                    </Button>
+                    <Button variant="outlined" onClick={handleOpenUpdateModal} startIcon={<UpdateIcon />}>
+                      Güncelle
+                    </Button>
+                  </>
+                )}
+              </Box>
+            }
+          />
 
-          <Grid item xs={12} md={6} lg={8}>
-            <AnalyticsWebsiteVisits
-              title="Website Visits"
-              subheader="(+43%) than last year"
-              chartLabels={[
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ]}
-              chartData={[
-                {
-                  name: 'Team A',
-                  type: 'column',
-                  fill: 'solid',
-                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-                },
-                {
-                  name: 'Team B',
-                  type: 'area',
-                  fill: 'gradient',
-                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-                },
-                {
-                  name: 'Team C',
-                  type: 'line',
-                  fill: 'solid',
-                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-                },
-              ]}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={4}>
-            <AnalyticsCurrentVisits
-              title="Current Visits"
-              chartData={[
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
-              ]}
-              chartColors={[
-                theme.palette.primary.main,
-                theme.palette.chart.blue[0],
-                theme.palette.chart.violet[0],
-                theme.palette.chart.yellow[0],
-              ]}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={8}>
-            <AnalyticsConversionRates
-              title="Conversion Rates"
-              subheader="(+43%) than last year"
-              chartData={[
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-                { label: 'South Korea', value: 690 },
-                { label: 'Netherlands', value: 1100 },
-                { label: 'United States', value: 1200 },
-                { label: 'United Kingdom', value: 1380 },
-              ]}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={4}>
-            <AnalyticsCurrentSubject
-              title="Current Subject"
-              chartLabels={['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math']}
-              chartData={[
-                { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
-                { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
-                { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
-              ]}
-              chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={8}>
-            <AnalyticsNewsUpdate title="News Update" list={_analyticPost} />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={4}>
-            <AnalyticsOrderTimeline title="Order Timeline" list={_analyticOrderTimeline} />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={4}>
-            <AnalyticsTrafficBySite title="Traffic by Site" list={_analyticTraffic} />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={8}>
-            <AnalyticsTasks
-              title="Tasks"
-              list={[
-                { id: '1', label: 'Create FireStone Logo' },
-                { id: '2', label: 'Add SCSS and JS files if required' },
-                { id: '3', label: 'Stakeholder Meeting' },
-                { id: '4', label: 'Scoping & Estimations' },
-                { id: '5', label: 'Sprint Showcase' },
-              ]}
-            />
-          </Grid> */}
-        </Grid>
+          <Box sx={{ height: 'auto', width: '100%' }}>
+            {automatData && automatTableLabels && (
+              <DataGrid
+                sx={{
+                  '& .MuiDataGrid-cellContent': {
+                    whiteSpace: 'pre-line', // Hücre içeriğini kelimeyi bölmeyecek şekilde korur
+                    overflow: 'hidden',
+                    textOverflow: 'initial',
+                    wordWrap: 'break-word',
+                  },
+                }}
+                getRowHeight={() => 'auto'}
+                getEstimatedRowHeight={() => 1000}
+                autoHeight={true}
+                rows={automatData}
+                columns={automatTableLabels}
+                rowsPerPageOptions={[5, 10, 25]}
+                sortingOrder={['desc', 'asc']}
+                initialState={{
+                  ...automatData.initialState,
+                  pagination: {
+                    pageSize: 10,
+                  },
+                  sorting: {
+                    sortModel: [
+                      {
+                        field: 'commodity',
+                        sort: 'asc',
+                      },
+                    ],
+                  },
+                }}
+                components={{ Toolbar: GridToolbar }}
+                disableSelectionOnClick
+                checkboxSelection
+                onSelectionModelChange={(selectedRowIds) => {
+                  handleSelectRow(selectedRowIds);
+                }}
+              />
+            )}
+          </Box>
+          <Divider />
+        </Card>
+        {selectedRowData && (
+          <UpdateModal
+            isOpen={isUpdateModalOpen}
+            onClose={handleCloseUpdateModal}
+            onAdd={handleUpdate}
+            selectedRowData={selectedRowData}
+            customLabels={customLabels}
+          />
+        )}
+        {addLabels && (
+          <AddModal
+            isOpen={isAddModalOpen}
+            onClose={handleCloseAddModal}
+            onAdd={handleAdd}
+            selectedRowData={addLabels}
+            customLabels={customLabels}
+          />
+        )}
       </Container>
     </Page>
   );

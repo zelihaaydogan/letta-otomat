@@ -44,6 +44,7 @@ export default function GeneralApp() {
   useEffect(() => {
     const getData = async () => {
       const response = await MapService.getCityData();
+      console.log(response);
       setCities(response.data);
     };
     getData();

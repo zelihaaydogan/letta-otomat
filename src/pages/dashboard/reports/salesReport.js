@@ -64,6 +64,7 @@ const TABLE_HEAD = [
   { id: 'Otomat Adı', label: 'Otomat Adı', align: 'left' },
   { id: 'salesMethod', label: 'Ödeme Yöntemi', align: 'left' },
   { id: 'price', label: 'Ücret', align: 'left' },
+  { id: 'epoch', label: 'Tarih', align: 'left', width: 180 },
   { id: 'productName', label: 'Ürün Adı', align: 'left', width: 180 },
   { id: 'productBrand', label: 'Ürünün Markası', align: 'left', width: 180 },
 

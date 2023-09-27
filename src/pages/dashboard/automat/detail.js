@@ -1,6 +1,6 @@
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, Card } from '@mui/material';
+import { Grid, Container, Typography, Card, CardHeader } from '@mui/material';
 // hooks
 import useSettings from '../../../hooks/useSettings';
 // layouts
@@ -19,6 +19,8 @@ import Tab from '@mui/material/Tab';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Box from '@mui/material/Box';
+import { TableMoreMenu, TableHeadCustom } from '../../../components/table';
+import Slots from '../../../sections/@dashboard/detailTable/Slots';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -117,6 +119,26 @@ export default function AutomatDetail() {
     fetchData();
   }, [id]);
 
+  const [slots, setSlots] = useState({});
+  useEffect(() => {
+    const fetchSlots = async () => {
+      try {
+        const response = await AutomatService.getAutomatSlots(id);
+
+        if (response.returnCode === 1) {
+          setSlots(response);
+        } else {
+          console.error('Veri alınamadı.');
+        }
+      } catch (error) {
+        console.error('Veri çekerken bir hata oluştu:', error);
+      }
+      console.log('slots', slots);
+    };
+
+    fetchSlots();
+  }, [id]);
+
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -149,10 +171,10 @@ export default function AutomatDetail() {
                   </Tabs>
                 </Box>
                 <CustomTabPanel value={value} index={0}>
-                  <></>
+                  {/* <CardHeader title={'Otomat Tanımları'} subheader={''} sx={{ mb: 3 }} /> */}
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
-                  Item Two
+                  {/* Item Two */}
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={2}>
                   {rows && (

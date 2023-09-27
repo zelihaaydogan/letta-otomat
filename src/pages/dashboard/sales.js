@@ -58,6 +58,7 @@ export default function GeneralAnalytics() {
         setSalesLabel(updatedLabels);
 
         const enumList = response.columnDict.find((item) => item.field === 'salesMethod').enumList.split(',');
+
         const months = [
           'Ocak',
           'Şubat',
@@ -78,7 +79,10 @@ export default function GeneralAnalytics() {
           const day = date.getDate();
           const monthIndex = date.getMonth();
           const year = date.getFullYear();
-          item.epoch = `${day} ${months[monthIndex]} ${year}`;
+          const hours = date.getHours();
+          const minutes = date.getMinutes();
+          const seconds = date.getSeconds();
+          item.epoch = `${day} ${months[monthIndex]} ${year} ${hours}:${minutes}:${seconds}`;
           if (enumList[item.salesMethod]) {
             if (enumList[item.salesMethod] === 'Cashless') {
               item.salesMethod = 'Kart';
@@ -165,7 +169,7 @@ export default function GeneralAnalytics() {
             <Grid item xs={12} sm={12} md={12}>
               <Card>
                 <CardHeader title="Satışlar" subheader="" sx={{ mb: 3 }} />
-                {/* Card bileşenini iç içe yerleştirin */}
+
                 <DataGrid
                   rows={salesData}
                   columns={salesLabel}

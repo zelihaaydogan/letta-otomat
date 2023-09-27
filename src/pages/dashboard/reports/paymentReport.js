@@ -49,8 +49,10 @@ import { BookingIllustration, CheckInIllustration, CheckOutIllustration } from '
 
 const TABLE_HEAD = [
   { id: 'bankName', label: 'Banka Adı', align: 'left' },
+  { id: 'cardType', label: 'Kart Tipi', align: 'left' },
   { id: 'status', label: 'Durum', align: 'left' },
   { id: 'price', label: 'Ücret', align: 'left', width: 180 },
+  { id: 'epoch', label: 'Tarih', align: 'left', width: 180 },
   { id: 'cardLastFourNo', label: 'Kart', align: 'left', width: 180 },
   { id: 'cardName', label: 'Kart Sahibi', align: 'left', width: 180 },
 
@@ -199,9 +201,9 @@ export default function SalesReport() {
                 }
                 color={
                   item.key === 'Success'
-                    ? 'success'
+                    ? '#4caf50'
                     : item.key == 'Failed'
-                    ? 'error'
+                    ? '#d32f2f'
                     : item.key == 'InsufficientFunds'
                     ? 'warning'
                     : 'secondary'

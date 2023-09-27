@@ -53,18 +53,8 @@ const CardItemStyle = styled('div')(({ theme }) => ({
 export default function PaymentTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow, cardNumber, cardValid }) {
   const theme = useTheme();
 
-  const {
-    bankName,
-    status,
-    createdAt,
-    inventoryType,
-    price,
-    productBrand,
-    balance,
-    cardLastFourNo,
-    cardName,
-    productName,
-  } = row;
+  const { bankName, status, createdAt, inventoryType, price, productBrand, cardType, cardLastFourNo, cardName, epoch } =
+    row;
 
   const [openMenu, setOpenMenuActions] = useState(null);
 
@@ -80,6 +70,19 @@ export default function PaymentTableRow({ row, selected, onEditRow, onSelectRow,
   const onToggleShowCurrency = () => {
     setShowCurrency((prev) => !prev);
   };
+  const handleCardType = (value) => {
+    switch (value) {
+      case 0:
+        return <Iconify icon={'logos:visa'} width={40} height={40} />;
+      case 1:
+        return <Iconify icon={'logos:mastercard'} width={40} height={40} />;
+      case 2:
+        return <Iconify icon={'fontisto:troy'} width={40} height={40} />;
+
+      default:
+        return <Iconify icon={'bytesize:creditcard'} width={40} height={40} />;
+    }
+  };
 
   return (
     <TableRow hover selected={selected}>
@@ -87,9 +90,11 @@ export default function PaymentTableRow({ row, selected, onEditRow, onSelectRow,
         <Checkbox checked={selected} onClick={onSelectRow} />
       </TableCell>
       <TableCell>{bankName}</TableCell>
+      <TableCell>{handleCardType(cardType)}</TableCell>
 
       <TableCell>{renderStatus(status)}</TableCell>
       <TableCell>{`${price} ₺`}</TableCell>
+      <TableCell>{formatUnixTimestamp(epoch)}</TableCell>
       <TableCell>
         <Typography variant="subtitle1" gutterBottom>{`********${cardLastFourNo}`}</Typography>
       </TableCell>
@@ -139,4 +144,30 @@ function renderStatus(status) {
   // return avatar ? (
   //   <Avatar alt={category} src={avatar} sx={{ width: 48, height: 48, boxShadow: (theme) => theme.customShadows.z8 }} />
   // ) : null;
+}
+function formatUnixTimestamp(timestamp) {
+  const months = [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
+  ];
+
+  const date = new Date(timestamp * 1000);
+  const day = date.getDate();
+  const monthIndex = date.getMonth();
+  const year = date.getFullYear();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+
+  return `${day} ${months[monthIndex]} ${year} ${hours}:${minutes}:${seconds}`;
 }
