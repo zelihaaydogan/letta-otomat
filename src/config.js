@@ -27,7 +27,8 @@ export const AUTH0_API = {
   domain: process.env.AUTH0_DOMAIN,
 };
 
-export const MAPBOX_API = process.env.MAPBOX_API;
+export const MAPBOX_API =
+  'pk.eyJ1IjoiZW5naW5sZXR0YSIsImEiOiJjbG40ZHA0bzAwM25qMmlvOHhteW1weXVrIn0.pMiqw2VnZnc1NJYbJfKKLQ';
 
 // ROOT PATH AFTER LOGIN SUCCESSFUL
 export const PATH_AFTER_LOGIN = PATH_DASHBOARD.general.app; // as '/dashboard/app'

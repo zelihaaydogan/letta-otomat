@@ -51,6 +51,7 @@ const navConfig = [
       // { title: 'Otomatlar', path: PATH_DASHBOARD.general.analytic, icon: ICONS.automat },
       // { title: 'Otomat Tanımları', path: PATH_DASHBOARD.general.automatDefinitions, icon: ICONS.automatDefinitions },
       { title: 'Satışlar', path: PATH_DASHBOARD.general.sales, icon: ICONS.sales },
+      { title: 'Dünya Haritası', path: PATH_DASHBOARD.general.worldMap },
       {
         title: 'Raporlar',
         path: PATH_DASHBOARD.report.root,

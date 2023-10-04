@@ -44,6 +44,7 @@ export const PATH_DASHBOARD = {
     // inventory: path(ROOTS_DASHBOARD, '/inventory'),
     sales: path(ROOTS_DASHBOARD, '/sales'),
     banking: path(ROOTS_DASHBOARD, '/listUsers'),
+    worldMap: path(ROOTS_DASHBOARD, '/worldmap'),
   },
   permissionDenied: path(ROOTS_DASHBOARD, '/permission-denied'),
   automat: {
